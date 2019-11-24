@@ -7,7 +7,7 @@ TRANSACTION_COLUMNS = ["status", "date", "description", "category", "amount"]
 ICON_LOCATOR = (By.CLASS_NAME, "os-icon")
 INPUT_LOCATOR = (By.CLASS_NAME, "form-control")
 REMEMBER_CHECKBOX_LOCATOR = (By.CLASS_NAME, "form-check-label")
-SOCIAL_ICON_LOCATOR = (By.CSS_SELECTOR, "div > a > img")
+SOCIAL_ICON_LOCATOR = (By.CSS_SELECTOR, "a > img")
 SUBMIT_LOGIN_LOCATOR = (By.CSS_SELECTOR, "button")
 
 # Generic Locators

@@ -5,7 +5,6 @@ import urllib.request
 from decimal import Decimal
 
 import pytest
-import pytest_check as check
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
@@ -40,52 +39,69 @@ class TestLoginPageAppearance(object):
         self.__config.read("config.ini")
         self.__driver = webdriver.Chrome()
         self.__page = Pages.Login(self.__driver, self.__config["environment"]["base_url"])
+        
+        self.__form_fields = self.__page.form_fields
+        self.__social_icons = self.__page.buttons.social_icons
 
     def teardown_class(self):
         self.__driver.quit()
 
-    def test_login_page_basics(self):
+    def test_login_page_title(self):
         assert self.__driver.title == "ACME demo app"
+
+    def test_login_page_header(self):
         assert self.__page.header_text == "Login Form"
 
     def test_no_alerts(self):
         assert not self.__page.alerts
 
-    def test_form_contents(self):
-        form_fields = self.__page.form_fields
-        check.equal(len(form_fields), 2)
+    def test_username_label(self):
+        assert self.__form_fields[0].label == "Username"
 
-        check.equal(form_fields[0].label, "Username")
-        check.equal(form_fields[0].placeholder_text, "Enter your username")
-        check.equal(form_fields[0].icon_class, "os-icon-user-male-circle")
+    def test_username_placeholder(self):
+        assert self.__form_fields[0].placeholder_text == "Enter your username"
 
-        check.equal(form_fields[1].label, "Password")
-        check.equal(form_fields[1].placeholder_text, "Enter your password")
-        check.equal(form_fields[1].icon_class, "os-icon-fingerprint")
+    def test_username_icon(self):
+        assert self.__form_fields[0].icon_class == "os-icon-user-male-circle"
 
-        check.equal(self.__page.buttons.submit_button_text, "Log In")
-        check.equal(self.__page.buttons.checkbox_text, "Remember Me")
+    def test_password_label(self):
+        assert self.__form_fields[1].label == "Password"
 
-    def test_images(self):
-        check.equal(self.__page.logo_image, "https://demo.applitools.com/img/logo-big.png")
+    def test_password_placeholder(self):
+        assert self.__form_fields[1].placeholder_text == "Enter your password"
 
-        social_icons = self.__page.buttons.social_icons
+    def test_password_icon(self):
+        assert self.__form_fields[1].icon_class, "os-icon-fingerprint"
 
-        # normal pytest assert on purpose: if the number of icons differs order in the following checks is not relevant
-        assert len(social_icons) == 3
+    def test_submit_label(self):
+        assert self.__page.buttons.submit_button_text == "Log In"
 
-        check.equal(social_icons[0].image_url, "https://demo.applitools.com/img/social-icons/twitter.png")
-        check.equal(social_icons[1].image_url, "https://demo.applitools.com/img/social-icons/facebook.png")
-        check.equal(social_icons[2].image_url, "https://demo.applitools.com/img/social-icons/linkedin.png")
+    def test_checkbox_label(self):
+        assert self.__page.buttons.checkbox_text == "Remember Me"
+
+    def test_logo_image(self):
+        assert self.__page.logo_image == "https://demo.applitools.com/img/logo-big.png"
+
+    def test_social_twitter(self):
+        assert len(self.__social_icons) > 0, "Twitter link missing"
+        assert self.__social_icons[0].image_url == "https://demo.applitools.com/img/social-icons/twitter.png"
+
+    def test_social_facebook(self):
+        assert len(self.__social_icons) > 1, "Facebook link missing or order unexpected"
+        assert self.__social_icons[1].image_url == "https://demo.applitools.com/img/social-icons/facebook.png"
+
+    def test_social_linkedin(self):
+        assert len(self.__social_icons) > 2, "LinkedIn link missing or order unexpected"
+        assert self.__social_icons[2].image_url == "https://demo.applitools.com/img/social-icons/linkedin.png"
 
     # known defect: non-complient with WCAG standards
-    def test_accessibility(self):
-        check.is_not_in(self.__page.logo_accessibility_text, [None, ""],
-                        "Product logo (containing an anchor) should have alternative text.")
+    def test_logo_accessibility(self):
+        assert self.__page.logo_accessibility_text, "Product logo (containing an anchor) should have alternative text."
 
+    # known defect: non-complient with WCAG standards
+    def test_social_icon_accessibility(self):
         for icon in self.__page.buttons.social_icons:
-            check.is_not_in(icon.accessibility_text, [None, ""],
-                            "Functional elements without text should have alternative text.")
+            assert icon.accessibility_text, "Functional elements without text should have alternative text."
 
 
 class TestLoginFunctionality(object):
