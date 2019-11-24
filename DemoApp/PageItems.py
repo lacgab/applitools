@@ -43,6 +43,13 @@ class FormGroup(object):
         return self._input_element().get_attribute("id")
 
     @property
+    def has_icon(self):
+        try:
+            return self._icon_element().is_displayed()
+        except NoSuchElementException:
+            return False
+
+    @property
     def icon_class(self):
         return self._icon_element().get_attribute("class").split()[-1]
 

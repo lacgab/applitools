@@ -62,6 +62,7 @@ class TestLoginPageAppearance(object):
         assert self.__form_fields[0].placeholder_text == "Enter your username"
 
     def test_username_icon(self):
+        assert self.__form_fields[0].has_icon, "Icon missing"
         assert self.__form_fields[0].icon_class == "os-icon-user-male-circle"
 
     def test_password_label(self):
@@ -71,7 +72,8 @@ class TestLoginPageAppearance(object):
         assert self.__form_fields[1].placeholder_text == "Enter your password"
 
     def test_password_icon(self):
-        assert self.__form_fields[1].icon_class, "os-icon-fingerprint"
+        assert self.__form_fields[1].has_icon, "Icon missing"
+        assert self.__form_fields[1].icon_class == "os-icon-fingerprint"
 
     def test_submit_label(self):
         assert self.__page.buttons.submit_button_text == "Log In"
