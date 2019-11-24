@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 import DemoApp.PageItems as PageItems
 
 EMPTY_ALERT_ID = "alertEmpty"
-STYLE_HIDDEN = "display: none"
+STYLE_HIDDEN = "z-index: -1"
 
 # LogIn Page
 ALERT_LOCATOR = (By.CLASS_NAME, "alert")
@@ -67,7 +67,10 @@ class Login(PageWithHeader):
 
     def _alerts(self):
         for element in self._alert_elements():
-            if element.get_attribute("id") != EMPTY_ALERT_ID and STYLE_HIDDEN not in element.get_attribute("style"):
+            if element.get_attribute("id") != EMPTY_ALERT_ID \
+                    and element.is_displayed() \
+                    and STYLE_HIDDEN not in element.get_attribute("style"):
+
                 yield element.text
 
     def _form_fields(self):

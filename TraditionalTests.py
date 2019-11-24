@@ -6,12 +6,13 @@ from decimal import Decimal
 
 import pytest
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 
 import DemoApp.Pages as Pages
 
-DEFAULT_TIMEOUT_SEC = 10
+DEFAULT_TIMEOUT_SEC = 3
 
 CANVAS_ANIMATION_SEC = 1
 CANVAS_DEFAULT_YEARS = 2
@@ -29,9 +30,6 @@ class TestLoginPageAppearance(object):
 
     Tests in this class are not changing the status of the application, therefore it is enough to load the page once
     and execute all these tests in the same session.
-
-    Instead of separation of each assert into a new test case, appearance is checked via pytest-check plugin that allows
-    non-blocking assertions.
     """
 
     def setup_class(self):
@@ -133,9 +131,11 @@ class TestLoginFunctionality(object):
         self.__page.type_password(password)
         self.__page.submit()
 
-        self.__wait.until(lambda _: len(self.__page.alerts) == 1)
-
-        assert self.__page.alerts[0] == expected
+        try:
+            self.__wait.until(lambda _: len(self.__page.alerts) == 1)
+            assert self.__page.alerts[0] == expected
+        except TimeoutException:
+            assert False, f"No alert appeared within {DEFAULT_TIMEOUT_SEC} seconds"
 
     @pytest.mark.parametrize("missing, expected",
                              [("user", "Username must be present"),
@@ -148,9 +148,11 @@ class TestLoginFunctionality(object):
         self.__remove_credential(missing)
         self.__page.submit()
 
-        self.__wait.until(lambda _: len(self.__page.alerts) == 1)
-
-        assert self.__page.alerts[0] == expected
+        try:
+            self.__wait.until(lambda _: len(self.__page.alerts) == 1)
+            assert self.__page.alerts[0] == expected
+        except TimeoutException:
+            assert False, f"No alert appeared within {DEFAULT_TIMEOUT_SEC} seconds"
 
     def test_successful_login(self):
         self.__page.type_user_name(DEFAULT_CREDENTIALS["user"])
