@@ -40,6 +40,9 @@ class TestDemoApp(object):
         self.__driver.quit()
         self.__eyes.abort()
 
+    def teardown_method(self):
+        self.__eyes.force_full_page_screenshot = False
+
     def test_login_page_appearance(self):
         self.__driver.get(self.__config["environment"]["base_url"])
         self.__eyes.open(self.__driver, "DemoApp", "Login Page Appearance", DEFAULT_VIEWPORT)
@@ -92,6 +95,7 @@ class TestDemoApp(object):
         self.__do_login()
         page = Pages.CustomerDashboard(self.__driver)
 
+        self.__eyes.force_full_page_screenshot = True
         self.__eyes.open(self.__driver, "DemoApp", "Table Sorting", DEFAULT_VIEWPORT)
         self.__eyes.check_window("Customer Dashboard - Default")
 
@@ -100,14 +104,22 @@ class TestDemoApp(object):
         self.__eyes.check_window("Customer Dashboard - Sorted by Amount")
         self.__eyes.close()
 
-    def test_canvas_chart(self):
+    @pytest.mark.parametrize("width, height",
+                             [(640, 480),
+                              (800, 600),
+                              (1024, 768)])
+    def test_canvas_chart(self, width, height):
         self.__do_login()
         page = Pages.CustomerDashboard(self.__driver)
 
         page.view_expense_chart()
         self.__wait_for_canvas_animation()
 
-        self.__eyes.open(self.__driver, "DemoApp", "Expenses Chart", DEFAULT_VIEWPORT)
+        self.__eyes.open(self.__driver,
+                         "DemoApp",
+                         f"Expenses Chart - {width}x{height}",
+                         {'width': width, 'height': height})
+
         self.__eyes.check_window("Chart Two Years")
 
         page.include_another_year()
