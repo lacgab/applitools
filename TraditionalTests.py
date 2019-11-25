@@ -112,14 +112,16 @@ class TestLoginFunctionality(object):
     design techniques for various string values, a single space character or any default string will do.
     """
 
-    def setup_method(self):
+    def setup_class(self):
         self.__config = configparser.ConfigParser()
         self.__config.read("config.ini")
         self.__driver = webdriver.Chrome()
-        self.__page = Pages.Login(self.__driver, self.__config["environment"]["base_url"])
         self.__wait = WebDriverWait(self.__driver, DEFAULT_TIMEOUT_SEC)
 
-    def teardown_method(self):
+    def setup_method(self):
+        self.__page = Pages.Login(self.__driver, self.__config["environment"]["base_url"])
+
+    def teardown_class(self):
         self.__driver.quit()
 
     @pytest.mark.parametrize("user, password,expected",
@@ -180,14 +182,16 @@ class TestTableSorting(object):
     kept here within the class. Tests are using the built-in sorting of Python to determine the expected results.
     """
 
-    def setup_method(self):
+    def setup_class(self):
         self.__config = configparser.ConfigParser()
         self.__config.read("config.ini")
         self.__driver = webdriver.Chrome()
         self.__wait = WebDriverWait(self.__driver, DEFAULT_TIMEOUT_SEC)
+
+    def setup_method(self):
         self.__page = self.__open_customer_dashboard(DEFAULT_CREDENTIALS)
 
-    def teardown_method(self):
+    def teardown_class(self):
         self.__driver.quit()
 
     def test_ascending_by_amount(self):
@@ -233,7 +237,7 @@ class TestCanvas(object):
     Trying to avoid environment-specific behaviour, headless browser with explicitly set resolution is used.
     """
 
-    def setup_method(self):
+    def setup_class(self):
         self.__config = configparser.ConfigParser()
         self.__config.read("config.ini")
 
@@ -244,7 +248,7 @@ class TestCanvas(object):
         self.__driver = webdriver.Chrome(options=chrome_options)
         self.__wait = WebDriverWait(self.__driver, DEFAULT_TIMEOUT_SEC)
 
-    def teardown_method(self):
+    def teardown_class(self):
         self.__driver.quit()
 
     @pytest.mark.parametrize("number_of_years, expected_md5",
@@ -292,14 +296,13 @@ class TestAdverts(object):
     on the server.
     """
 
-    def setup_method(self):
+    def setup_class(self):
         self.__config = configparser.ConfigParser()
         self.__config.read("config.ini")
         self.__driver = webdriver.Chrome()
-        self.__page = Pages.Login(self.__driver, self.__config["environment"]["base_url"], query_string="?showAd=true")
         self.__wait = WebDriverWait(self.__driver, DEFAULT_TIMEOUT_SEC)
 
-    def teardown_method(self):
+    def teardown_class(self):
         self.__driver.quit()
 
     def test_two_adverts_on_dashboard(self):
@@ -316,6 +319,7 @@ class TestAdverts(object):
         assert adverts[1].image_url == "https://demo.applitools.com/img/flashSale2.gif"
 
     def __go_to_dashboard(self):
+        self.__page = Pages.Login(self.__driver, self.__config["environment"]["base_url"], query_string="?showAd=true")
         self.__page.type_user_name(DEFAULT_CREDENTIALS["user"])
         self.__page.type_password(DEFAULT_CREDENTIALS["password"])
         self.__page.submit()
