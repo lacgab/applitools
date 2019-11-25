@@ -10,3 +10,9 @@ How to execute "Traditional Tests":
   1. `pip install -r requirements.txt`
   2. to switch System Under Test set `base_url` in `config.ini`
   3. `python -m pytest TraditionalTests.py`
+
+How to execute "Visual AI Tests":
+  1. `pip install -r requirements.txt`
+  2. set your API key under `applitools` section in `config.ini`
+  3. to switch System Under Test set `base_url` in `config.ini`
+  4. `python -m pytest VisualAITests.py`
